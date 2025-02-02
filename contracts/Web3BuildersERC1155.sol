@@ -7,9 +7,9 @@ import {ERC1155Pausable} from "@openzeppelin/contracts/token/ERC1155/extensions/
 import {ERC1155Supply} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
 
-
-contract Web3Builders is ERC1155, Ownable, ERC1155Pausable, ERC1155Supply {
+contract Web3Builders is ERC1155, Ownable, ERC1155Pausable, ERC1155Supply, PaymentSplitter {
   
     uint256 public publicPrice = 0.02 ether;
     uint256 public allowListPrice = 0.01 ether;
@@ -17,15 +17,20 @@ contract Web3Builders is ERC1155, Ownable, ERC1155Pausable, ERC1155Supply {
     uint256 public maxSupply = 20;
     uint256 public maxPerWallet = 3;
 
-    bool public publicMintOpen = false;
+    bool public publicMintOpen = true;
     bool public allowListMintOpen = true;
 
     mapping(address => bool) public allowList;
     mapping(address => uint256) public purchasesPerWallet;
   
-    constructor(address initialOwner)
-        ERC1155("ipfs://Qmaa6TuP2s9pSKczHF4rwWhTKUdygrrDs8RmYYqCjP3Hye/")
+    constructor(
+        address initialOwner, 
+        address[] memory _payees,
+        uint256[] memory _shares
+        )
+        ERC1155("ipfs://bafybeid5vcxajzjhca53mf5kf534uirfqapccojexiopndsyos4rl3vzuu/")
         Ownable(initialOwner)
+        PaymentSplitter(_payees, _shares)
     {}
 
     //Create an edit function that will edit the mint windows:
@@ -35,7 +40,7 @@ contract Web3Builders is ERC1155, Ownable, ERC1155Pausable, ERC1155Supply {
         allowListMintOpen = _allowListMintOpen;
     }
 
-//Funtion to set the allowList
+    //Funtion to set the allowList
 
     function setAllowList(address[] calldata addresses) external onlyOwner {
         
